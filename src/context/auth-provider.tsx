@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { createContext, useContext, useEffect } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import useWorkspaceId from "@/hooks/use-workspace-id";
-import useAuth from "@/hooks/api/use-auth";
 import { UserType, WorkspaceType } from "@/types/api.type";
 import useGetWorkspaceQuery from "@/hooks/api/use-get-workspace";
 import { useNavigate } from "react-router-dom";
@@ -23,21 +22,24 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+// Function to retrieve user from localStorage
+const getUserFromLocalStorage = (): UserType | null => {
+  const storedUser = localStorage.getItem("user");
+  return storedUser ? JSON.parse(storedUser) : null;
+};
+
+// Function to retrieve workspace ID from localStorage
+const getWorkspaceIdFromLocalStorage = (): string | null => {
+  const storedUser = getUserFromLocalStorage();
+  return storedUser?.currentWorkspace?._id ?? null;
+};
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
-  const workspaceId = useWorkspaceId();
+  const [user, setUser] = useState<UserType | undefined>(getUserFromLocalStorage() || undefined);
+  const workspaceId = useWorkspaceId() || getWorkspaceIdFromLocalStorage() || '';
 
-  const {
-    data: authData,
-    error: authError,
-    isLoading,
-    isFetching,
-    refetch: refetchAuth,
-  } = useAuth();
-  const user = authData?.user;
-
+  // Fetch workspace details if workspaceId exists
   const {
     data: workspaceData,
     isLoading: workspaceLoading,
@@ -48,10 +50,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const workspace = workspaceData?.workspace;
 
   useEffect(() => {
-    if (workspaceError) {
-      if (workspaceError?.errorCode === "ACCESS_UNAUTHORIZED") {
-        navigate("/"); // Redirect if the user is not a member of the workspace
-      }
+    if (workspaceError?.errorCode === "ACCESS_UNAUTHORIZED") {
+      navigate("/"); // Redirect if the user is not authorized
     }
   }, [navigate, workspaceError]);
 
@@ -67,11 +67,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         user,
         workspace,
         hasPermission,
-        error: authError || workspaceError,
-        isLoading,
-        isFetching,
+        error: workspaceError,
+        isLoading: false, // No API request for user
+        isFetching: false,
         workspaceLoading,
-        refetchAuth,
+        refetchAuth: () => {
+          const updatedUser = getUserFromLocalStorage();
+          setUser(updatedUser || undefined);
+        },
         refetchWorkspace,
       }}
     >
@@ -84,7 +87,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 export const useAuthContext = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useCurrentUserContext must be used within a AuthProvider");
+    throw new Error("useAuthContext must be used within an AuthProvider");
   }
   return context;
 };

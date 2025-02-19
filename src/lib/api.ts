@@ -69,6 +69,7 @@ export const getCurrentUserQueryFn = async (): Promise<CurrentUserResponseType> 
 // Helper function to get the user from localStorage
 const getUserFromLocalStorage = () => {
   const storedUser = localStorage.getItem("user");
+  console.log(storedUser)
   return storedUser ? JSON.parse(storedUser) : null;
 };
 
