@@ -29,19 +29,39 @@ export const loginMutationFn = async (
   data: loginType
 ): Promise<LoginResponseType> => {
   const response = await API.post("/auth/login", data);
+  
+  // Extract only the user object from the response
+  const user = response.data.user;
+  console.log(user)
+
+  // Store the user object in local storage
+  localStorage.setItem("user", JSON.stringify(user));
+
   return response.data;
 };
+
 
 export const registerMutationFn = async (data: registerType) =>
   await API.post("/auth/register", data);
 
-export const logoutMutationFn = async () => await API.post("/auth/logout");
+export const logoutMutationFn = async () => {
+  await API.post("/auth/logout");
 
-export const getCurrentUserQueryFn =
-  async (): Promise<CurrentUserResponseType> => {
-    const response = await API.get(`/user/current`);
-    return response.data;
-  };
+  // Remove user data from local storage on logout
+  localStorage.removeItem("user");
+};
+export const getCurrentUserQueryFn = async (): Promise<CurrentUserResponseType> => {
+  // Retrieve user details from local storage
+  const user = localStorage.getItem("user");
+
+  if (user) {
+    return JSON.parse(user); // Parse JSON before returning
+  }
+
+  throw new Error("No user found in local storage");
+};
+
+
 
 //********* WORKSPACE ****************
 //************* */

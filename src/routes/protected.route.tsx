@@ -1,15 +1,14 @@
-import { DashboardSkeleton } from "@/components/skeleton-loaders/dashboard-skeleton";
-import useAuth from "@/hooks/api/use-auth";
 import { Navigate, Outlet } from "react-router-dom";
 
 const ProtectedRoute = () => {
-  const { data: authData, isLoading } = useAuth();
-  const user = authData?.user;
+  const storedUser = localStorage.getItem("user");
+  const user = storedUser ? JSON.parse(storedUser) : null;
 
-  if (isLoading) {
-    return <DashboardSkeleton />;
-  }
-  return user ? <Outlet /> : <Navigate to="/" replace />;
+  // Prevent infinite re-renders: only navigate if user doesn't exist
+  if (!user) return <Navigate to="/login" replace />;
+
+  return <Outlet />;
 };
 
 export default ProtectedRoute;
+
