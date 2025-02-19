@@ -66,26 +66,44 @@ export const getCurrentUserQueryFn = async (): Promise<CurrentUserResponseType> 
 //********* WORKSPACE ****************
 //************* */
 
+// Helper function to get the user from localStorage
+const getUserFromLocalStorage = () => {
+  const storedUser = localStorage.getItem("user");
+  return storedUser ? JSON.parse(storedUser) : null;
+};
+
+// Create Workspace with user object in request body
 export const createWorkspaceMutationFn = async (
   data: CreateWorkspaceType
 ): Promise<CreateWorkspaceResponseType> => {
-  const response = await API.post(`/workspace/create/new`, data);
+  const user = getUserFromLocalStorage();
+  const response = await API.post(`/workspace/create/new`, {
+    ...data,
+    user, // Include user object in request body
+  });
   return response.data;
 };
 
+// Edit Workspace with user object
 export const editWorkspaceMutationFn = async ({
   workspaceId,
   data,
 }: EditWorkspaceType) => {
-  const response = await API.put(`/workspace/update/${workspaceId}`, data);
+  const user = getUserFromLocalStorage();
+  const response = await API.put(`/workspace/update/${workspaceId}`, {
+    ...data,
+    user,
+  });
   return response.data;
 };
 
+// Get all workspaces where user is a member
 export const getAllWorkspacesUserIsMemberQueryFn =
   async (): Promise<AllWorkspaceResponseType> => {
     const response = await API.get(`/workspace/all`);
     return response.data;
   };
+
 
 export const getWorkspaceByIdQueryFn = async (
   workspaceId: string
