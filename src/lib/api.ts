@@ -78,12 +78,20 @@ export const createWorkspaceMutationFn = async (
   data: CreateWorkspaceType
 ): Promise<CreateWorkspaceResponseType> => {
   const user = getUserFromLocalStorage();
+  const userId = user?._id; // Extract the user ID
+
+  if (!userId) {
+    throw new Error("Unauthorized: User ID not found.");
+  }
+
   const response = await API.post(`/workspace/create/new`, {
     ...data,
-    user, // Include user object in request body
+    userId, // Pass userId in the request body
   });
+
   return response.data;
 };
+
 
 // Edit Workspace with user object
 export const editWorkspaceMutationFn = async ({
