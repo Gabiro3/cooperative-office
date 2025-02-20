@@ -33,7 +33,7 @@ const RecentProjects = () => {
          text-sm text-muted-foreground
           text-center py-5"
         >
-          No Project created yet
+          No farm season added yet
         </div>
       )}
 
@@ -68,16 +68,7 @@ const RecentProjects = () => {
                     </p>
                   </div>
                   <div className="ml-auto flex items-center gap-4">
-                    <span className="text-sm text-gray-500">Created by</span>
-                    <Avatar className="hidden h-9 w-9 sm:flex">
-                      <AvatarImage
-                        src={project.createdBy.profilePicture || ""}
-                        alt="Avatar"
-                      />
-                      <AvatarFallback className={avatarColor}>
-                        {initials}
-                      </AvatarFallback>
-                    </Avatar>
+                    <span className="text-sm text-gray-500">Created by: {project.createdBy.name}</span>
                   </div>
                 </div>
               </Link>

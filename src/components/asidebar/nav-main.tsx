@@ -4,7 +4,7 @@ import {
   LucideIcon,
   Settings,
   Users,
-  CheckCircle,
+  Wallet,
   LayoutDashboard,
 } from "lucide-react";
 import {
@@ -43,9 +43,9 @@ export function NavMain() {
       icon: LayoutDashboard,
     },
     {
-      title: "Tasks",
+      title: "Loans",
       url: `/workspace/${workspaceId}/tasks`,
-      icon: CheckCircle,
+      icon: Wallet,
     },
     {
       title: "Members",

@@ -17,6 +17,7 @@ API.interceptors.request.use(
     const user = localStorage.getItem("user");
     if (user) {
       const parsedUser = JSON.parse(user);
+      console.log(parsedUser)
       if (parsedUser?._id) {
         // Add userId to the request headers
         config.headers["userId"] = parsedUser._id; // Use "userId" in headers

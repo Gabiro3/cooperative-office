@@ -2,6 +2,7 @@ import { Separator } from "@/components/ui/separator";
 import InviteMember from "@/components/workspace/member/invite-member";
 import AllMembers from "@/components/workspace/member/all-members";
 import WorkspaceHeader from "@/components/workspace/common/workspace-header";
+import AddMemberDialog from "@/components/workspace/task/add-member-dialog";
 
 export default function Members() {
   return (
@@ -12,13 +13,15 @@ export default function Members() {
         <div className="w-full max-w-3xl mx-auto pt-3">
           <div>
             <h2 className="text-lg leading-[30px] font-semibold mb-1">
-              Workspace members
+              Cooperative members
             </h2>
             <p className="text-sm text-muted-foreground">
-              Workspace members can view and join all Workspace project, tasks
-              and create new task in the Workspace.
+              Here&apos;s the list of members for this cooperative! Click the button
+              below to add a new member.
             </p>
           </div>
+          <Separator className="my-4" />
+          <AddMemberDialog />
           <Separator className="my-4" />
 
           <InviteMember />

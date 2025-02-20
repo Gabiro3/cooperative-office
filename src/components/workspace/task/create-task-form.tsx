@@ -34,13 +34,16 @@ import {
   transformOptions,
 } from "@/lib/helper";
 import useWorkspaceId from "@/hooks/use-workspace-id";
-import { TaskPriorityEnum, TaskStatusEnum } from "@/constant";
+import { TaskPriorityEnum } from "@/constant";
 import useGetProjectsInWorkspaceQuery from "@/hooks/api/use-get-projects";
 import useGetWorkspaceMembers from "@/hooks/api/use-get-workspace-members";
+import { useQuery } from "@tanstack/react-query";
+import { getAllFarmersQueryFn } from "@/lib/api";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { createTaskMutationFn } from "@/lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
+import { Key, ReactElement, JSXElementConstructor, ReactNode, ReactPortal } from "react";
 
 export default function CreateTaskForm(props: {
   projectId?: string;
@@ -60,10 +63,14 @@ export default function CreateTaskForm(props: {
     skip: !!projectId,
   });
 
-  const { data: memberData } = useGetWorkspaceMembers(workspaceId);
+  // Using `useQuery` to fetch the farmers/members data from the API
+  const { data: farmerData, isLoading: isFarmersLoading } = useQuery({
+    queryKey: ["farmers", workspaceId],
+    queryFn: () => getAllFarmersQueryFn({ workspaceId }), // Fetch the farmers from your API
+  });
 
   const projects = data?.projects || [];
-  const members = memberData?.members || [];
+  const members = farmerData?.farmers || [];
 
   //Workspace Projects
   const projectOptions = projects?.map((project) => {
@@ -79,8 +86,13 @@ export default function CreateTaskForm(props: {
   });
 
   // Workspace Memebers
-  const membersOptions = members?.map((member) => {
-    const name = member.userId?.name || "Unknown";
+  const membersOptions = members?.map((member: {
+    fullName: string;
+    _id: any; userId: {
+      fullName: string; profilePicture: any; _id: any; 
+}; 
+}) => {
+    const name = member.fullName || "Unknown";
     const initials = getAvatarFallbackText(name);
     const avatarColor = getAvatarColor(name);
 
@@ -94,7 +106,7 @@ export default function CreateTaskForm(props: {
           <span>{name}</span>
         </div>
       ),
-      value: member.userId._id,
+      value: member.fullName,
     };
   });
 
@@ -106,12 +118,9 @@ export default function CreateTaskForm(props: {
     projectId: z.string().trim().min(1, {
       message: "Project is required",
     }),
-    status: z.enum(
-      Object.values(TaskStatusEnum) as [keyof typeof TaskStatusEnum],
-      {
-        required_error: "Status is required",
-      }
-    ),
+    amount: z.string().transform((val) => parseFloat(val)).refine((val) => !isNaN(val), {
+      message: "Amount must be a valid number",
+    }),    
     priority: z.enum(
       Object.values(TaskPriorityEnum) as [keyof typeof TaskPriorityEnum],
       {
@@ -120,9 +129,6 @@ export default function CreateTaskForm(props: {
     ),
     assignedTo: z.string().trim().min(1, {
       message: "AssignedTo is required",
-    }),
-    dueDate: z.date({
-      required_error: "A date of birth is required.",
     }),
   });
 
@@ -135,10 +141,7 @@ export default function CreateTaskForm(props: {
     },
   });
 
-  const taskStatusList = Object.values(TaskStatusEnum);
   const taskPriorityList = Object.values(TaskPriorityEnum); // ["LOW", "MEDIUM", "HIGH", "URGENT"]
-
-  const statusOptions = transformOptions(taskStatusList);
   const priorityOptions = transformOptions(taskPriorityList);
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
@@ -148,7 +151,8 @@ export default function CreateTaskForm(props: {
       projectId: values.projectId,
       data: {
         ...values,
-        dueDate: values.dueDate.toISOString(),
+        status: "IN_REVIEW" as "IN_REVIEW",
+        dueDate: new Date().toISOString(),
       },
     };
 
@@ -164,7 +168,7 @@ export default function CreateTaskForm(props: {
 
         toast({
           title: "Success",
-          description: "Task created successfully",
+          description: "Loan created successfully",
           variant: "success",
         });
         onClose();
@@ -187,10 +191,10 @@ export default function CreateTaskForm(props: {
             className="text-xl tracking-[-0.16px] dark:text-[#fcfdffef] font-semibold mb-1
            text-center sm:text-left"
           >
-            Create Task
+            Record a new loan
           </h1>
           <p className="text-muted-foreground text-sm leading-tight">
-            Organize and manage tasks, resources, and team collaboration
+            Record a new loan for the cooperative members
           </p>
         </div>
         <Form {...form}>
@@ -202,11 +206,11 @@ export default function CreateTaskForm(props: {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="dark:text-[#f1f7feb5] text-sm">
-                      Task title
+                      Loan title
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Website Redesign"
+                        placeholder="e.g. Kugura imashini"
                         className="!h-[48px]"
                         {...field}
                       />
@@ -225,13 +229,37 @@ export default function CreateTaskForm(props: {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="dark:text-[#f1f7feb5] text-sm">
-                      Task description
+                      Loan description
                       <span className="text-xs font-extralight ml-2">
                         Optional
                       </span>
                     </FormLabel>
                     <FormControl>
-                      <Textarea rows={1} placeholder="Description" {...field} />
+                      <Textarea rows={1} placeholder="e.g. Kugura imashini yo gusya ibigori" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* {Amount} */}
+            <div>
+              <FormField
+                control={form.control}
+                name="amount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="dark:text-[#f1f7feb5] text-sm">
+                      Loan Amount
+                    </FormLabel>
+                    <FormControl>
+                    <Input
+                        placeholder="e.g. 200000"
+                        type="number"
+                        className="!h-[48px]"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -248,7 +276,7 @@ export default function CreateTaskForm(props: {
                   name="projectId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Project</FormLabel>
+                      <FormLabel>Farm Season</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
@@ -273,7 +301,7 @@ export default function CreateTaskForm(props: {
                               <SelectItem
                                 key={option.value}
                                 className="!capitalize cursor-pointer"
-                                value={option.value}
+                                value={String(option.value)}
                               >
                                 {option.label}
                               </SelectItem>
@@ -296,14 +324,14 @@ export default function CreateTaskForm(props: {
                 name="assignedTo"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Assigned To</FormLabel>
+                    <FormLabel>Loan beneficiary</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select a assignee" />
+                          <SelectValue placeholder="Select cooperative member" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -312,105 +340,16 @@ export default function CreateTaskForm(props: {
                            overflow-y-auto scrollbar
                           "
                         >
-                          {membersOptions?.map((option) => (
+                          {membersOptions?.map((option: { value: Key | null | undefined; label: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined; }) => (
                             <SelectItem
                               className="cursor-pointer"
                               key={option.value}
-                              value={option.value}
+                              value={String(option.value)}
                             >
                               {option.label}
                             </SelectItem>
                           ))}
                         </div>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* {Due Date} */}
-            <div className="!mt-2">
-              <FormField
-                control={form.control}
-                name="dueDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Due Date</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"outline"}
-                            className={cn(
-                              "w-full flex-1 pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {field.value ? (
-                              format(field.value, "PPP")
-                            ) : (
-                              <span>Pick a date</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          disabled={
-                            (date) =>
-                              date <
-                                new Date(new Date().setHours(0, 0, 0, 0)) || // Disable past dates
-                              date > new Date("2100-12-31") //Prevent selection beyond a far future date
-                          }
-                          initialFocus
-                          defaultMonth={new Date()}
-                          fromMonth={new Date()}
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* {Status} */}
-
-            <div>
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue
-                            className="!text-muted-foreground !capitalize"
-                            placeholder="Select a status"
-                          />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {statusOptions?.map((status) => (
-                          <SelectItem
-                            className="!capitalize"
-                            key={status.value}
-                            value={status.value}
-                          >
-                            {status.label}
-                          </SelectItem>
-                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />

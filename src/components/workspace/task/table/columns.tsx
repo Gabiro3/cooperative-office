@@ -13,12 +13,9 @@ import {
 } from "@/constant";
 import {
   formatStatusToEnum,
-  getAvatarColor,
-  getAvatarFallbackText,
 } from "@/lib/helper";
 import { priorities, statuses } from "./data";
 import { TaskType } from "@/types/api.type";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export const getColumns = (projectId?: string): ColumnDef<TaskType>[] => {
   const columns: ColumnDef<TaskType>[] = [
@@ -70,7 +67,7 @@ export const getColumns = (projectId?: string): ColumnDef<TaskType>[] => {
           {
             accessorKey: "project",
             header: ({ column }: { column: Column<TaskType, unknown> }) => (
-              <DataTableColumnHeader column={column} title="Project" />
+              <DataTableColumnHeader column={column} title="Farm Season" />
             ),
             cell: ({ row }: { row: Row<TaskType> }) => {
               const project = row.original.project;
@@ -81,7 +78,6 @@ export const getColumns = (projectId?: string): ColumnDef<TaskType>[] => {
 
               return (
                 <div className="flex items-center gap-1">
-                  <span className="rounded-full border">{project.emoji}</span>
                   <span className="block capitalize truncate w-[100px] text-ellipsis">
                     {project.name}
                   </span>
@@ -93,26 +89,16 @@ export const getColumns = (projectId?: string): ColumnDef<TaskType>[] => {
     {
       accessorKey: "assignedTo",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Assigned To" />
+        <DataTableColumnHeader column={column} title="Beneficiary" />
       ),
       cell: ({ row }) => {
         const assignee = row.original.assignedTo || null;
-        const name = assignee?.name || "";
-
-        const initials = getAvatarFallbackText(name);
-        const avatarColor = getAvatarColor(name);
 
         return (
-          name && (
+          assignee && (
             <div className="flex items-center gap-1">
-              <Avatar className="h-6 w-6">
-                <AvatarImage src={assignee?.profilePicture || ""} alt={name} />
-                <AvatarFallback className={avatarColor}>
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
               <span className="block text-ellipsis w-[100px] truncate">
-                {assignee?.name}
+                {assignee}
               </span>
             </div>
           )
@@ -127,8 +113,8 @@ export const getColumns = (projectId?: string): ColumnDef<TaskType>[] => {
       cell: ({ row }) => {
         return (
           <span className="lg:max-w-[100px] text-sm">
-            {row.original.dueDate ? format(row.original.dueDate, "PPP") : null}
-          </span>
+  {row.original.dueDate ? format(row.original.dueDate, "dd/MM/yy") : null}
+</span>
         );
       },
     },
@@ -204,6 +190,24 @@ export const getColumns = (projectId?: string): ColumnDef<TaskType>[] => {
         );
       },
     },
+    {
+      accessorKey: "amount",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Amount (RWF)" />
+      ),
+      cell: ({ row }) => {
+        const formattedAmount = new Intl.NumberFormat().format(row.original.amount);
+    
+        return (
+          <div className="flex items-center space-x-1">
+  <span className="block lg:max-w-[220px] max-w-[200px] font-medium">
+    {formattedAmount}
+  </span>
+</div>
+
+        );
+      },
+    },    
     {
       id: "actions",
       cell: ({ row }) => {

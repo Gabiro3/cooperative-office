@@ -77,14 +77,14 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[160px]">
           <DropdownMenuItem className="cursor-pointer">
-            Edit Task
+            Edit Loan
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className={`!text-destructive cursor-pointer ${taskId}`}
             onClick={() => setOpenDialog(true)}
           >
-            Delete Task
+            Delete Loan
             <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -95,7 +95,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
         isLoading={isPending}
         onClose={() => setOpenDialog(false)}
         onConfirm={handleConfirm}
-        title="Delete Task"
+        title="Delete Loan"
         description={`Are you sure you want to delete ${taskCode}`}
         confirmText="Delete"
         cancelText="Cancel"

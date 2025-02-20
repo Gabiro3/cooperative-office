@@ -127,9 +127,10 @@ export type AllMembersInWorkspaceResponseType = {
 export type AnalyticsResponseType = {
   message: string;
   analytics: {
-    totalTasks: number;
-    overdueTasks: number;
-    completedTasks: number;
+    approvedLoans: number;
+    pendingLoans: number;
+    totalMembers: number;
+    loansAmount: number;
   };
 };
 
@@ -175,7 +176,7 @@ export type CreateProjectPayloadType = {
 };
 
 export type ProjectResponseType = {
-  message: "Project created successfully";
+  message: "Farm season successfully";
   project: ProjectType;
 };
 
@@ -237,13 +238,10 @@ export type TaskType = {
   };
   priority: TaskPriorityEnumType;
   status: TaskStatusEnumType;
-  assignedTo: {
-    _id: string;
-    name: string;
-    profilePicture: string | null;
-  } | null;
+  assignedTo: string;
   createdBy?: string;
   dueDate: string;
+  amount: number;
   taskCode: string;
   createdAt?: string;
   updatedAt?: string;
@@ -253,6 +251,7 @@ export type AllTaskPayloadType = {
   workspaceId: string;
   projectId?: string | null;
   keyword?: string | null;
+  amount?: number | null;
   priority?: TaskPriorityEnumType | null;
   status?: TaskStatusEnumType | null;
   assignedTo?: string | null;

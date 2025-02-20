@@ -256,6 +256,7 @@ export const getAllTasksQueryFn = async ({
   keyword,
   projectId,
   assignedTo,
+  amount,
   priority,
   status,
   dueDate,
@@ -269,6 +270,7 @@ export const getAllTasksQueryFn = async ({
   if (projectId) queryParams.append("projectId", projectId);
   if (assignedTo) queryParams.append("assignedTo", assignedTo);
   if (priority) queryParams.append("priority", priority);
+  if (amount) queryParams.append("amount", amount?.toString());
   if (status) queryParams.append("status", status);
   if (dueDate) queryParams.append("dueDate", dueDate);
   if (pageNumber) queryParams.append("pageNumber", pageNumber?.toString());
@@ -293,3 +295,112 @@ export const deleteTaskMutationFn = async ({
   );
   return response.data;
 };
+
+//************FARMERS */
+// Create Farmer
+export const createFarmerMutationFn = async ({
+  workspaceId,
+  data,
+}: {
+  workspaceId: string;
+  data: {
+    fullName: string;
+    phoneNumber: string;
+    email: string;
+    landArea: number;
+    memberType: string;
+    avgYieldSoldToMarket: string;
+    nationalId: string;
+    cooperativeId: string;
+    joinedDate: string;
+  };
+}) => {
+  const response = await API.post(
+    `/farmer/workspace/${workspaceId}/create`,
+    data
+  );
+  return response.data;
+};
+
+// Get All Farmers
+export const getAllFarmersQueryFn = async ({
+  workspaceId,
+  keyword,
+  memberType,
+  pageNumber,
+  pageSize,
+}: {
+  workspaceId: string;
+  keyword?: string;
+  memberType?: string;
+  pageNumber?: number;
+  pageSize?: number;
+}) => {
+  const baseUrl = `/farmer/workspace/${workspaceId}/all`;
+
+  const queryParams = new URLSearchParams();
+  if (keyword) queryParams.append("keyword", keyword);
+  if (memberType) queryParams.append("memberType", memberType);
+  if (pageNumber) queryParams.append("pageNumber", pageNumber.toString());
+  if (pageSize) queryParams.append("pageSize", pageSize.toString());
+
+  const url = queryParams.toString() ? `${baseUrl}?${queryParams}` : baseUrl;
+  const response = await API.get(url);
+  return response.data;
+};
+
+// Delete Farmer
+export const deleteFarmerMutationFn = async ({
+  workspaceId,
+  farmerId,
+}: {
+  workspaceId: string;
+  farmerId: string;
+}) => {
+  const response = await API.delete(
+    `/farmer/${farmerId}/workspace/${workspaceId}/delete`
+  );
+  return response.data;
+};
+
+// Update Farmer
+export const updateFarmerMutationFn = async ({
+  workspaceId,
+  farmerId,
+  data,
+}: {
+  workspaceId: string;
+  farmerId: string;
+  data: {
+    fullName?: string;
+    phoneNumber?: string;
+    email?: string;
+    landArea?: number;
+    memberType?: string;
+    avgYieldSoldToMarket?: number;
+    nationalId?: string;
+    cooperativeId?: string;
+    joinedDate?: string;
+  };
+}) => {
+  const response = await API.put(
+    `/farmer/${farmerId}/workspace/${workspaceId}/update`,
+    data
+  );
+  return response.data;
+};
+
+// Get Farmer by ID
+export const getFarmerByIdQueryFn = async ({
+  workspaceId,
+  farmerId,
+}: {
+  workspaceId: string;
+  farmerId: string;
+}) => {
+  const response = await API.get(
+    `/farmer/${farmerId}/workspace/${workspaceId}`
+  );
+  return response.data;
+};
+

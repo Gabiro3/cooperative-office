@@ -15,6 +15,7 @@ const useTaskTableFilter = () => {
       Object.values(TaskPriorityEnum)
     ),
     keyword: parseAsString,
+    AMOUNT: parseAsString,
     projectId: parseAsString,
     assigneeId: parseAsString,
   });

@@ -1,91 +1,70 @@
 import { ChevronDown, Loader } from "lucide-react";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"; // adjust import path as needed
+import { toast } from "@/hooks/use-toast";// or your preferred toast library
 import { getAvatarColor, getAvatarFallbackText } from "@/lib/helper";
-import { useAuthContext } from "@/context/auth-provider";
 import useWorkspaceId from "@/hooks/use-workspace-id";
-import useGetWorkspaceMembers from "@/hooks/api/use-get-workspace-members";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { changeWorkspaceMemberRoleMutationFn } from "@/lib/api";
-import { toast } from "@/hooks/use-toast";
-import { Permissions } from "@/constant";
+import { useQuery } from "@tanstack/react-query";
+import { getAllFarmersQueryFn, deleteFarmerMutationFn } from "@/lib/api";
+
 const AllMembers = () => {
-  const { user, hasPermission } = useAuthContext();
-
-  const canChangeMemberRole = hasPermission(Permissions.CHANGE_MEMBER_ROLE);
-
-  const queryClient = useQueryClient();
   const workspaceId = useWorkspaceId();
 
-  const { data, isPending } = useGetWorkspaceMembers(workspaceId);
-  const members = data?.members || [];
-  const roles = data?.roles || [];
-
-  const { mutate, isPending: isLoading } = useMutation({
-    mutationFn: changeWorkspaceMemberRoleMutationFn,
+  const { data, isLoading } = useQuery({
+    queryKey: ['farmers', workspaceId],
+    queryFn: () => getAllFarmersQueryFn({ workspaceId }),
   });
-
-  const handleSelect = (roleId: string, memberId: string) => {
-    if (!roleId || !memberId) return;
-    const payload = {
-      workspaceId,
-      data: {
-        roleId,
-        memberId,
-      },
-    };
-    mutate(payload, {
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: ["members", workspaceId],
-        });
-        toast({
-          title: "Success",
-          description: "Member's role changed successfully",
-          variant: "success",
-        });
-      },
-      onError: (error) => {
-        toast({
-          title: "Error",
-          description: error.message,
-          variant: "destructive",
-        });
-      },
-    });
-  };
 
   return (
     <div className="grid gap-6 pt-2">
-      {isPending ? (
+      {isLoading ? (
         <Loader className="w-8 h-8 animate-spin place-self-center flex" />
       ) : null}
 
-      {members?.map((member) => {
-        const name = member.userId?.name;
+      {data?.farmers?.map((farmer: any) => {
+        const name = farmer.fullName;
         const initials = getAvatarFallbackText(name);
         const avatarColor = getAvatarColor(name);
+
+        // Function to handle deletion
+        const handleDelete = async () => {
+          try {
+            await deleteFarmerMutationFn({
+              workspaceId,
+              farmerId: farmer._id,
+            });
+            toast({
+              title: "Success",
+              description: "Farmer deleted successfully",
+              variant: "success",
+            });
+          } catch (error) {
+            toast({
+              title: "Error",
+              description: (error as Error).message,
+              variant: "destructive",
+            });
+          }
+        };
+
         return (
-          <div className="flex items-center justify-between space-x-4">
+          <div key={farmer._id} className="flex items-center justify-between space-x-4">
             <div className="flex items-center space-x-4">
               <Avatar className="h-8 w-8">
                 <AvatarImage
-                  src={member.userId?.profilePicture || ""}
+                  src={farmer.profilePicture || ""}
                   alt="Image"
                 />
                 <AvatarFallback className={avatarColor}>
@@ -95,79 +74,60 @@ const AllMembers = () => {
               <div>
                 <p className="text-sm font-medium leading-none">{name}</p>
                 <p className="text-sm text-muted-foreground">
-                  {member.userId.email}
+                  Tel: {farmer.phoneNumber}
                 </p>
               </div>
             </div>
+
             <div className="flex items-center gap-3">
+              {/* View More Dropdown for Farmer Details */}
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="ml-auto min-w-24 capitalize disabled:opacity-95 disabled:pointer-events-none"
-                    disabled={
-                      isLoading ||
-                      !canChangeMemberRole ||
-                      member.userId._id === user?._id
-                    }
-                  >
-                    {member.role.name?.toLowerCase()}{" "}
-                    {canChangeMemberRole && member.userId._id !== user?._id && (
-                      <ChevronDown className="text-muted-foreground" />
-                    )}
+                  <Button variant="link" size="sm">
+                    View More
                   </Button>
                 </PopoverTrigger>
-                {canChangeMemberRole && (
-                  <PopoverContent className="p-0" align="end">
-                    <Command>
-                      <CommandInput
-                        placeholder="Select new role..."
-                        disabled={isLoading}
-                        className="disabled:pointer-events-none"
-                      />
-                      <CommandList>
-                        {isLoading ? (
-                          <Loader className="w-8 h-8 animate-spin place-self-center flex my-4" />
-                        ) : (
-                          <>
-                            <CommandEmpty>No roles found.</CommandEmpty>
-                            <CommandGroup>
-                              {roles?.map(
-                                (role) =>
-                                  role.name !== "OWNER" && (
-                                    <CommandItem
-                                      key={role._id}
-                                      disabled={isLoading}
-                                      className="disabled:pointer-events-none gap-1 mb-1  flex flex-col items-start px-4 py-2 cursor-pointer"
-                                      onSelect={() => {
-                                        handleSelect(
-                                          role._id,
-                                          member.userId._id
-                                        );
-                                      }}
-                                    >
-                                      <p className="capitalize">
-                                        {role.name?.toLowerCase()}
-                                      </p>
-                                      <p className="text-sm text-muted-foreground">
-                                        {role.name === "ADMIN" &&
-                                          `Can view, create, edit tasks, project and manage settings .`}
-
-                                        {role.name === "MEMBER" &&
-                                          `Can view,edit only task created by.`}
-                                      </p>
-                                    </CommandItem>
-                                  )
-                              )}
-                            </CommandGroup>
-                          </>
-                        )}
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                )}
+                <PopoverContent className="w-72">
+                  <div>
+                    <p className="text-sm">Farmer's Additional Details</p>
+                    <p><strong>Land Area:</strong> {farmer.landArea}</p>
+                    <p>
+                      <strong>Joined Date:</strong>{" "}
+                      {new Date(farmer.joinedDate).toLocaleDateString()}
+                    </p>
+                    <p>
+                      <strong>Avg Yield Sold:</strong> {farmer.avgYieldSoldToMarket}
+                    </p>
+                  </div>
+                </PopoverContent>
               </Popover>
+
+              {/* Delete Member Button with Confirmation */}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" size="sm">
+                    Delete
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Confirm Deletion
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you sure you want to delete this Cooperative member? This action is irreversible.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>
+                      Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDelete}>
+                      Confirm
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
         );

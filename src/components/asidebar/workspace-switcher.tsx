@@ -67,7 +67,7 @@ export function WorkspaceSwitcher() {
   return (
     <>
       <SidebarGroupLabel className="w-full justify-between pr-0">
-        <span>Workspaces</span>
+        <span>Cooperative Admin.</span>
         <button
           onClick={onOpen}
           className="flex size-5 items-center justify-center rounded-full border"
@@ -92,13 +92,13 @@ export function WorkspaceSwitcher() {
                       <span className="truncate font-semibold">
                         {activeWorkspace?.name}
                       </span>
-                      <span className="truncate text-xs">Free</span>
+                      <span className="truncate text-xs">Admin</span>
                     </div>
                   </>
                 ) : (
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-semibold">
-                      No Workspace selected
+                      No Cooperative selected
                     </span>
                   </div>
                 )}
@@ -112,7 +112,7 @@ export function WorkspaceSwitcher() {
               sideOffset={4}
             >
               <DropdownMenuLabel className="text-xs text-muted-foreground">
-                Workspaces
+                Cooperatives
               </DropdownMenuLabel>
               {isPending ? <Loader className=" w-5 h-5 animate-spin" /> : null}
 
@@ -143,7 +143,7 @@ export function WorkspaceSwitcher() {
                   <Plus className="size-4" />
                 </div>
                 <div className="font-medium text-muted-foreground">
-                  Add workspace
+                  Add Cooperative
                 </div>
               </DropdownMenuItem>
             </DropdownMenuContent>

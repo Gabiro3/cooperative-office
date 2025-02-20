@@ -45,7 +45,7 @@ const RecentTasks = () => {
          text-sm text-muted-foreground
           text-center py-5"
         >
-          No Task created yet
+          No loans recorded yet
         </div>
       )}
 

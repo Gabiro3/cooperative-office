@@ -78,7 +78,7 @@ export default function CreateProjectForm({
 
         toast({
           title: "Success",
-          description: "Project created successfully",
+          description: "Farm Season successfully",
           variant: "success",
         });
 
@@ -103,10 +103,10 @@ export default function CreateProjectForm({
             className="text-xl tracking-[-0.16px] dark:text-[#fcfdffef] font-semibold mb-1
            text-center sm:text-left"
           >
-            Create Project
+           Add Farm Season
           </h1>
           <p className="text-muted-foreground text-sm leading-tight">
-            Organize and manage tasks, resources, and team collaboration
+            Organize and manage loans into farm seasons.
           </p>
         </div>
         <Form {...form}>
@@ -136,11 +136,11 @@ export default function CreateProjectForm({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="dark:text-[#f1f7feb5] text-sm">
-                      Project title
+                      Farm season title
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Website Redesign"
+                        placeholder="e.g. Term A 2025"
                         className="!h-[48px]"
                         {...field}
                       />
@@ -157,7 +157,7 @@ export default function CreateProjectForm({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="dark:text-[#f1f7feb5] text-sm">
-                      Project description
+                      Farm season description
                       <span className="text-xs font-extralight ml-2">
                         Optional
                       </span>
@@ -165,7 +165,7 @@ export default function CreateProjectForm({
                     <FormControl>
                       <Textarea
                         rows={4}
-                        placeholder="Projects description"
+                        placeholder="e.g. Dukeneye gusaba inguzanyo zo guhinga ibirayi."
                         {...field}
                       />
                     </FormControl>

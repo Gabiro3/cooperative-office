@@ -37,7 +37,7 @@ const SignIn = () => {
 
   const formSchema = z.object({
     email: z.string().trim().email("Invalid email address").min(1, {
-      message: "Workspace name is required",
+      message: "Email is required",
     }),
     password: z.string().trim().min(1, {
       message: "Password is required",
@@ -80,7 +80,7 @@ const SignIn = () => {
           className="flex items-center gap-2 self-center font-medium"
         >
           <Logo />
-          Team Sync.
+          Dataseed Cooperative Terminal.
         </Link>
         <div className="flex flex-col gap-6">
           <Card>

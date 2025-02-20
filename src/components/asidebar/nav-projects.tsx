@@ -107,7 +107,7 @@ export function NavProjects() {
     <>
       <SidebarGroup className="group-data-[collapsible=icon]:hidden">
         <SidebarGroupLabel className="w-full justify-between pr-0">
-          <span>Projects</span>
+          <span>Farm Seasons</span>
 
           <PermissionsGuard requiredPermission={Permissions.CREATE_PROJECT}>
             <button
@@ -132,8 +132,8 @@ export function NavProjects() {
           {!isPending && projects?.length === 0 ? (
             <div className="pl-3">
               <p className="text-xs text-muted-foreground">
-                There is no projects in this Workspace yet. Projects you create
-                will show up here.
+                Farm seasons will enable you
+                to track loans for a specific farming season.
               </p>
               <PermissionsGuard requiredPermission={Permissions.CREATE_PROJECT}>
                 <Button
@@ -142,7 +142,7 @@ export function NavProjects() {
                   className="h-0 p-0 text-[13px] underline font-semibold mt-4"
                   onClick={onOpen}
                 >
-                  Create a project
+                  Add a farm season
                   <ArrowRight />
                 </Button>
               </PermissionsGuard>
@@ -175,7 +175,7 @@ export function NavProjects() {
                         onClick={() => navigate(`${projectUrl}`)}
                       >
                         <Folder className="text-muted-foreground" />
-                        <span>View Project</span>
+                        <span>View loans</span>
                       </DropdownMenuItem>
 
                       <PermissionsGuard
@@ -187,7 +187,7 @@ export function NavProjects() {
                           onClick={() => onOpenDialog(item)}
                         >
                           <Trash2 className="text-muted-foreground" />
-                          <span>Delete Project</span>
+                          <span>Delete farm season</span>
                         </DropdownMenuItem>
                       </PermissionsGuard>
                     </DropdownMenuContent>

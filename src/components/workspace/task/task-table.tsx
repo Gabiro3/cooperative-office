@@ -51,6 +51,7 @@ const TaskTable = () => {
       getAllTasksQueryFn({
         workspaceId,
         keyword: filters.keyword,
+        amount: filters.AMOUNT ? Number(filters.AMOUNT) : null,
         priority: filters.priority,
         status: filters.status,
         projectId: projectId || filters.projectId,
@@ -159,7 +160,7 @@ const DataTableFilterToolbar: FC<DataTableFilterToolbarProps> = ({
   return (
     <div className="flex flex-col lg:flex-row w-full items-start space-y-2 mb-2 lg:mb-0 lg:space-x-2  lg:space-y-0">
       <Input
-        placeholder="Filter tasks..."
+        placeholder="Filter loans..."
         value={filters.keyword || ""}
         onChange={(e) =>
           setFilters({
@@ -190,7 +191,7 @@ const DataTableFilterToolbar: FC<DataTableFilterToolbarProps> = ({
 
       {/* Assigned To filter */}
       <DataTableFacetedFilter
-        title="Assigned To"
+        title="Beneficiary"
         multiSelect={true}
         options={assigneesOptions}
         disabled={isLoading}
@@ -200,7 +201,7 @@ const DataTableFilterToolbar: FC<DataTableFilterToolbarProps> = ({
 
       {!projectId && (
         <DataTableFacetedFilter
-          title="Projects"
+          title="Farm Season"
           multiSelect={false}
           options={projectOptions}
           disabled={isLoading}
