@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import CreateMemberForm from "./new-member-form";
 
-const AddMemberDialog = (props: { projectId?: string }) => {
+const AddMemberDialog = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const onClose = () => {

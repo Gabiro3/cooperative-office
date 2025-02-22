@@ -4,6 +4,7 @@ import useWorkspaceId from "@/hooks/use-workspace-id";
 import { getAvatarColor, getAvatarFallbackText } from "@/lib/helper";
 import { format } from "date-fns";
 import { Loader } from "lucide-react";
+import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal, Key } from "react";
 
 const RecentMembers = () => {
   const workspaceId = useWorkspaceId();
@@ -22,8 +23,10 @@ const RecentMembers = () => {
       ) : null}
 
       <ul role="list" className="space-y-3">
-        {members.map((member, index) => {
-          const name = member?.userId?.name || "";
+        {members.map((member: { userId: {
+          fullName: string; name: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined; profilePicture: any; 
+}; role: { name: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined; }; joinedAt: any; }, index: Key | null | undefined) => {
+          const name = member?.userId?.fullName || "";
           const initials = getAvatarFallbackText(name);
           const avatarColor = getAvatarColor(name);
           return (

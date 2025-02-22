@@ -1,9 +1,7 @@
 import { Link } from "react-router-dom";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import useWorkspaceId from "@/hooks/use-workspace-id";
 import useGetProjectsInWorkspaceQuery from "@/hooks/api/use-get-projects";
 import { Loader } from "lucide-react";
-import { getAvatarColor, getAvatarFallbackText } from "@/lib/helper";
 import { format } from "date-fns";
 
 const RecentProjects = () => {
@@ -39,10 +37,6 @@ const RecentProjects = () => {
 
       <ul role="list" className="space-y-2">
         {projects.map((project) => {
-          const name = project.createdBy.name;
-          const initials = getAvatarFallbackText(name);
-          const avatarColor = getAvatarColor(name);
-
           return (
             <li
               key={project._id}

@@ -7,7 +7,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import RecentProjects from "@/components/workspace/project/recent-projects";
 import RecentTasks from "@/components/workspace/task/recent-tasks";
 import AllMembers from "@/components/workspace/member/all-members";
-import RecentMembers from "@/components/workspace/member/recent-members";
 const WorkspaceDashboard = () => {
   const { onOpen } = useCreateProjectDialog();
   return (

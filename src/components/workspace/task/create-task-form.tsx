@@ -1,8 +1,7 @@
 import { z } from "zod";
-import { format } from "date-fns";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { CalendarIcon, Loader } from "lucide-react";
+import { Loader } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -18,16 +17,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "../../ui/textarea";
-import { cn } from "@/lib/utils";
-import { Calendar } from "@/components/ui/calendar";
 import {
   getAvatarColor,
   getAvatarFallbackText,
@@ -36,7 +28,6 @@ import {
 import useWorkspaceId from "@/hooks/use-workspace-id";
 import { TaskPriorityEnum } from "@/constant";
 import useGetProjectsInWorkspaceQuery from "@/hooks/api/use-get-projects";
-import useGetWorkspaceMembers from "@/hooks/api/use-get-workspace-members";
 import { useQuery } from "@tanstack/react-query";
 import { getAllFarmersQueryFn } from "@/lib/api";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -64,7 +55,7 @@ export default function CreateTaskForm(props: {
   });
 
   // Using `useQuery` to fetch the farmers/members data from the API
-  const { data: farmerData, isLoading: isFarmersLoading } = useQuery({
+  const { data: farmerData } = useQuery({
     queryKey: ["farmers", workspaceId],
     queryFn: () => getAllFarmersQueryFn({ workspaceId }), // Fetch the farmers from your API
   });
