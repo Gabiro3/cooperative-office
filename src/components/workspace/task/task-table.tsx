@@ -112,10 +112,10 @@ const DataTableFilterToolbar: FC<DataTableFilterToolbarProps> = ({
     workspaceId,
   });
 
-  const { data: memberData } = useGetWorkspaceMembers(workspaceId);
+  const { data: farmersData } = useGetWorkspaceMembers(workspaceId);
 
   const projects = data?.projects || [];
-  const members = memberData?.members || [];
+  const farmers = farmersData?.farmers || [];
 
   //Workspace Projects
   const projectOptions = projects?.map((project) => {
@@ -131,8 +131,8 @@ const DataTableFilterToolbar: FC<DataTableFilterToolbarProps> = ({
   });
 
   // Workspace Memebers
-  const assigneesOptions = members?.map((member) => {
-    const name = member.userId?.name || "Unknown";
+  const assigneesOptions = farmers?.map((member: { fullName: string; profilePicture: any; _id: any; }) => {
+    const name = member.fullName|| "Unknown";
     const initials = getAvatarFallbackText(name);
     const avatarColor = getAvatarColor(name);
 
@@ -140,13 +140,13 @@ const DataTableFilterToolbar: FC<DataTableFilterToolbarProps> = ({
       label: (
         <div className="flex items-center space-x-2">
           <Avatar className="h-7 w-7">
-            <AvatarImage src={member.userId?.profilePicture || ""} alt={name} />
+            <AvatarImage src={member.profilePicture || ""} alt={name} />
             <AvatarFallback className={avatarColor}>{initials}</AvatarFallback>
           </Avatar>
           <span>{name}</span>
         </div>
       ),
-      value: member.userId._id,
+      value: member.fullName,
     };
   });
 
@@ -186,18 +186,22 @@ const DataTableFilterToolbar: FC<DataTableFilterToolbarProps> = ({
         options={priorities}
         disabled={isLoading}
         selectedValues={filters.priority?.split(",") || []}
-        onFilterChange={(values) => handleFilterChange("priority", values)}
+        onFilterChange={(values) =>
+          handleFilterChange("priority", values)}
       />
 
       {/* Assigned To filter */}
       <DataTableFacetedFilter
-        title="Beneficiary"
-        multiSelect={true}
-        options={assigneesOptions}
-        disabled={isLoading}
-        selectedValues={filters.assigneeId?.split(",") || []}
-        onFilterChange={(values) => handleFilterChange("assigneeId", values)}
-      />
+  title="Beneficiary"
+  multiSelect={true}
+  options={assigneesOptions}
+  disabled={isLoading}
+  selectedValues={filters.assigneeId?.split(",") || []}
+  onFilterChange={(values) => {
+    handleFilterChange("assigneeId", values); // Call your existing filter change handler
+  }}
+/>
+
 
       {!projectId && (
         <DataTableFacetedFilter
