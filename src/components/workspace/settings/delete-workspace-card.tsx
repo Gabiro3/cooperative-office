@@ -49,7 +49,7 @@ const DeleteWorkspaceCard = () => {
             className="text-[17px] tracking-[-0.16px] dark:text-[#fcfdffef] font-semibold mb-1.5
            text-center sm:text-left"
           >
-            Delete Workspace
+            Delete Cooperative
           </h1>
         </div>
 
@@ -60,9 +60,9 @@ const DeleteWorkspaceCard = () => {
           <div className="flex flex-col items-start justify-between py-0">
             <div className="flex-1 mb-2">
               <p>
-                Deleting a workspace is a permanent action and cannot be undone.
-                Once you delete a workspace, all its associated data, including
-                projects, tasks, and member roles, will be permanently removed.
+                Deleting a cooperative is a permanent action and cannot be undone.
+                Once you delete a cooperative, all its associated data, including
+                farm seasons, loans, and member information, will be permanently removed.
                 Please proceed with caution and ensure this action is
                 intentional.
               </p>
@@ -72,7 +72,7 @@ const DeleteWorkspaceCard = () => {
               variant="destructive"
               onClick={onOpenDialog}
             >
-              Delete Workspace
+              Delete Cooperative
             </Button>
           </div>
         </PermissionsGuard>
@@ -83,7 +83,7 @@ const DeleteWorkspaceCard = () => {
         isLoading={isPending}
         onClose={onCloseDialog}
         onConfirm={handleConfirm}
-        title={`Delete  ${workspace?.name} Workspace`}
+        title={`Delete  ${workspace?.name}?`}
         description={`Are you sure you want to delete? This action cannot be undone.`}
         confirmText="Delete"
         cancelText="Cancel"

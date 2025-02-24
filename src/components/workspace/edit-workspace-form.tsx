@@ -87,7 +87,7 @@ export default function EditWorkspaceForm() {
             className="text-[17px] tracking-[-0.16px] dark:text-[#fcfdffef] font-semibold mb-1.5
            text-center sm:text-left"
           >
-            Edit Workspace
+            Edit Cooperative
           </h1>
         </div>
         <Form {...form}>
@@ -99,7 +99,7 @@ export default function EditWorkspaceForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="dark:text-[#f1f7feb5] text-sm">
-                      Workspace name
+                      Cooperative name
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -121,7 +121,7 @@ export default function EditWorkspaceForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="dark:text-[#f1f7feb5] text-sm">
-                      Workspace description
+                      Cooperative description
                       <span className="text-xs font-extralight ml-2">
                         Optional
                       </span>
@@ -147,7 +147,7 @@ export default function EditWorkspaceForm() {
                 type="submit"
               >
                 {isPending && <Loader className="animate-spin" />}
-                Update Workspace
+                Update Cooperative
               </Button>
             )}
           </form>

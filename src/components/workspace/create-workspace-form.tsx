@@ -77,11 +77,10 @@ export default function CreateWorkspaceForm({
             className="text-2xl tracking-[-0.16px] dark:text-[#fcfdffef] font-semibold mb-1.5
            text-center sm:text-left"
           >
-            Let's build a Workspace
+            Create a new Cooperative
           </h1>
           <p className="text-muted-foreground text-lg leading-tight">
-            Boost your productivity by making it easier for everyone to access
-            projects in one location.
+            Fill in the details of your cooperative.
           </p>
         </div>
         <Form {...form}>
@@ -93,7 +92,7 @@ export default function CreateWorkspaceForm({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="dark:text-[#f1f7feb5] text-sm">
-                      Workspace name
+                      Cooperative name
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -103,7 +102,7 @@ export default function CreateWorkspaceForm({
                       />
                     </FormControl>
                     <FormDescription>
-                      This is the name of your company, team or organization.
+                      This is the name of your cooperative.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -117,7 +116,7 @@ export default function CreateWorkspaceForm({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="dark:text-[#f1f7feb5] text-sm">
-                      Workspace description
+                      Cooperative description
                       <span className="text-xs font-extralight ml-2">
                         Optional
                       </span>
@@ -130,8 +129,7 @@ export default function CreateWorkspaceForm({
                       />
                     </FormControl>
                     <FormDescription>
-                      Get your members on board with a few words about your
-                      Workspace.
+                      This is a brief description of your cooperative, what it does and where it is located.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -145,14 +143,14 @@ export default function CreateWorkspaceForm({
               type="submit"
             >
               {isPending && <Loader className="animate-spin" />}
-              Create Workspace
+              Create Cooperative
             </Button>
           </form>
         </Form>
       </div>
       <div
         className="relative flex-1 shrink-0 hidden bg-muted md:block
-      bg-[url('/images/workspace.jpg')] bg-cover bg-center h-full
+      bg-[url('/images/Coop.jpg')] bg-cover bg-center h-full
       "
       />
     </main>
