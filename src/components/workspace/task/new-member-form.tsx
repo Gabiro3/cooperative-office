@@ -184,18 +184,24 @@ export default function CreateMemberForm(props: {
             )}
           />
           <FormField
-            control={form.control}
-            name="landArea"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Land Area (Ha)</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="Enter land area" type="number"/>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+  control={form.control}
+  name="landArea"
+  render={({ field }) => (
+    <FormItem>
+      <FormLabel>Land Area (Ha)</FormLabel>
+      <FormControl>
+        <Input 
+          {...field} 
+          placeholder="Enter land area" 
+          type="number"
+          onChange={(e) => field.onChange(e.target.valueAsNumber)}
+        />
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  )}
+/>
+
 
           {/* Farm Details */}
           <FormField

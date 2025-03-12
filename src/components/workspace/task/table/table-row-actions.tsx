@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Row } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,7 +14,7 @@ import { ConfirmDialog } from "@/components/resuable/confirm-dialog";
 import { TaskType } from "@/types/api.type";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useWorkspaceId from "@/hooks/use-workspace-id";
-import { deleteTaskMutationFn } from "@/lib/api";
+import { deleteTaskMutationFn, updateTaskMutationFn } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 
 interface DataTableRowActionsProps {
@@ -27,15 +26,46 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
   const queryClient = useQueryClient();
   const workspaceId = useWorkspaceId();
 
-  const { mutate, isPending } = useMutation({
+  const taskId = row.original._id as string;
+  const taskCode = row.original.taskCode;
+  const projectId = row.original.project?._id as string; // Assuming projectId exists in the row data
+
+  // Mutation for deleting a task
+  const { mutate: deleteTask, isPending: isDeleting } = useMutation({
     mutationFn: deleteTaskMutationFn,
   });
 
-  const taskId = row.original._id as string;
-  const taskCode = row.original.taskCode;
+  // Mutation for updating a task (Approving Loan)
+  const { mutate: approveLoan, isPending: isApproving } = useMutation({
+    mutationFn: updateTaskMutationFn,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["all-tasks", workspaceId] });
+      toast({
+        title: "Success",
+        description: data.message,
+        variant: "success",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
 
-  const handleConfirm = () => {
-    mutate(
+  const handleApproveLoan = () => {
+    approveLoan({
+      taskId,
+      workspaceId,
+      projectId,
+      data: { status: "DONE", priority: "HIGH" },
+    });
+  };
+
+  const handleConfirmDelete = () => {
+    deleteTask(
       {
         workspaceId,
         taskId,
@@ -76,8 +106,12 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[160px]">
-          <DropdownMenuItem className="cursor-pointer">
-            Edit Loan
+          <DropdownMenuItem 
+            className="cursor-pointer"
+            onClick={handleApproveLoan}
+            disabled={isApproving}
+          >
+            {isApproving ? "Approving..." : "Approve Loan"}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
@@ -92,11 +126,11 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
 
       <ConfirmDialog
         isOpen={openDeleteDialog}
-        isLoading={isPending}
+        isLoading={isDeleting}
         onClose={() => setOpenDialog(false)}
-        onConfirm={handleConfirm}
+        onConfirm={handleConfirmDelete}
         title="Delete Loan"
-        description={`Are you sure you want to delete ${taskCode}`}
+        description={`Are you sure you want to delete ${taskCode}?`}
         confirmText="Delete"
         cancelText="Cancel"
       />

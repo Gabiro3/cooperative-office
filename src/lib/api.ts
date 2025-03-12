@@ -23,6 +23,7 @@ import {
   registerType,
   WorkspaceByIdResponseType,
   EditWorkspaceType,
+  UpdateTaskPayloadType,
 } from "@/types/api.type";
 
 export const loginMutationFn = async (
@@ -168,6 +169,20 @@ export const invitedUserJoinWorkspaceMutationFn = async (
   return response.data;
 };
 
+export const invitedOfficerJoinCooperativeMutationFn = async (
+  workspaceId: string,
+  officerId: string
+): Promise<{
+  message: string;
+  workspaceId: string;
+}> => {
+  const response = await API.post(`/workspace/officers/new/${workspaceId}`, {
+    officerId: officerId, // Send officerId as 'officerid' in the request body
+  });
+  console.log(response.data)
+  return response.data;
+};
+
 //********* */
 //********* PROJECTS
 export const createProjectMutationFn = async ({
@@ -292,6 +307,18 @@ export const deleteTaskMutationFn = async ({
 }> => {
   const response = await API.delete(
     `task/${taskId}/workspace/${workspaceId}/delete`
+  );
+  return response.data;
+};
+export const updateTaskMutationFn = async ({
+  taskId,
+  workspaceId,
+  projectId,
+  data,
+}: UpdateTaskPayloadType) => {
+  const response = await API.put(
+    `/task/${taskId}/project/${projectId}/workspace/${workspaceId}/update`,
+    data
   );
   return response.data;
 };

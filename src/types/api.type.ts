@@ -247,6 +247,20 @@ export type TaskType = {
   updatedAt?: string;
 };
 
+export type UpdateTaskPayloadType = {
+  taskId: string; // The ID of the task to update
+  workspaceId: string; // The workspace the task belongs to
+  projectId: string; // The project the task belongs to
+  data: {
+    title?: string; // The updated title (optional as we may not update all fields)
+    description?: string; // The updated description (optional)
+    priority?: TaskPriorityEnumType; // The updated priority (optional)
+    status?: TaskStatusEnumType; // The updated status (optional)
+    assignedTo?: string; // The updated assignee (optional)
+    dueDate?: string; // The updated due date (optional)
+  };
+};
+
 export type AllTaskPayloadType = {
   workspaceId: string;
   projectId?: string | null;

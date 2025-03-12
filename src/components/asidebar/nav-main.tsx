@@ -6,6 +6,7 @@ import {
   Users,
   Wallet,
   LayoutDashboard,
+  File,
 } from "lucide-react";
 import {
   SidebarGroup,
@@ -51,6 +52,11 @@ export function NavMain() {
       title: "Members",
       url: `/workspace/${workspaceId}/members`,
       icon: Users,
+    },
+    {
+      title: "Documents",
+      url: `/workspace/${workspaceId}/files`,
+      icon: File,
     },
 
     ...(canManageSettings

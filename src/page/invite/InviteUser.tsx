@@ -10,9 +10,8 @@ import {
 import Logo from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { BASE_ROUTE } from "@/routes/common/routePaths";
-import useAuth from "@/hooks/api/use-auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { invitedUserJoinWorkspaceMutationFn } from "@/lib/api";
+import { invitedOfficerJoinCooperativeMutationFn } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 
 const InviteUser = () => {
@@ -22,34 +21,36 @@ const InviteUser = () => {
   const param = useParams();
   const inviteCode = param.inviteCode as string;
 
-  const { data: authData, isPending } = useAuth();
-  const user = authData?.user;
+  const authData = JSON.parse(localStorage.getItem("user") || "null");
+  const officerId = authData?._id;
 
   const { mutate, isPending: isLoading } = useMutation({
-    mutationFn: invitedUserJoinWorkspaceMutationFn,
+    mutationFn: (variables: { workspaceId: string; officerId: string }) =>
+      invitedOfficerJoinCooperativeMutationFn(variables.workspaceId, variables.officerId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["userWorkspaces"] });
+      navigate(`/`);
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
   });
 
   const returnUrl = encodeURIComponent(
     `${BASE_ROUTE.INVITE_URL.replace(":inviteCode", inviteCode)}`
   );
 
-  const handleSubmit = (e: { preventDefault: () => void }) => {
+  const handleSubmit = (e: { preventDefault: () => void; }) => {
     e.preventDefault();
-    mutate(inviteCode, {
-      onSuccess: (data) => {
-        queryClient.resetQueries({
-          queryKey: ["userWorkspaces"],
-        });
-        navigate(`/workspace/${data.workspaceId}`);
-      },
-      onError: (error) => {
-        toast({
-          title: "Error",
-          description: error.message,
-          variant: "destructive",
-        });
-      },
-    });
+    if (!officerId) {
+      toast({ title: "Error", description: "User ID not found", variant: "destructive" });
+      return;
+    }
+    mutate({ workspaceId: inviteCode, officerId });
   };
 
   return (
@@ -66,19 +67,19 @@ const InviteUser = () => {
           <Card>
             <CardHeader className="text-center">
               <CardTitle className="text-xl">
-                Hey there! You're invited to join a TeamSync Workspace!
+                Hey there! You're invited to join a Dataseed Cooperative!
               </CardTitle>
               <CardDescription>
-                Looks like you need to be logged into your TeamSync account to
-                join this Workspace.
+                Looks like you need to be logged into your Dataseed account to
+                join this Cooperative.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {isPending ? (
+              {isLoading ? (
                 <Loader className="!w-11 !h-11 animate-spin place-self-center flex" />
               ) : (
                 <div>
-                  {user ? (
+                  {authData ? (
                     <div className="flex items-center justify-center my-3">
                       <form onSubmit={handleSubmit}>
                         <Button
@@ -89,7 +90,7 @@ const InviteUser = () => {
                           {isLoading && (
                             <Loader className="!w-6 !h-6 animate-spin" />
                           )}
-                          Join the Workspace
+                          Join the Cooperative
                         </Button>
                       </form>
                     </div>
